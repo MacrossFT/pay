@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+
+    <title>欢迎登录员工管理系统</title>
+    <meta charset="utf-8">
+
+    <base href="/">
+
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap-responsive.css"/>
+    <script type="text/javascript" src="../bootstrap/js/jquery-1.7.2.js"></script>
+    <script type="text/javascript" src="../bootstrap/js/bootstrap.js"></script>
+</head>
+<style>
+    .change{
+        width:100%;
+        height:100%;
+        FILTER: progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#FFF,endColorStr=#D1BBFF); /*IE*/
+        background:-moz-linear-gradient(top,#FFF,#D1BBFF);/*火狐*/
+        background:-webkit-gradient(linear, 0% 39.1%, 0% 100%,from(#FFF), to(#D1BBFF));/*谷歌*/
+    }
+</style>
+
+<body>
+
+<div class="container change">
+
+    <div class="modal" id="login">
+        <div class="modal-header">
+            <h4>用户登录</h4>
+        </div>
+        <div class="modal-body">
+            <form id="form1" class="form-horizontal" action="/pay/user/login" method="post">
+                <div class="control-group">
+                    <label class="control-label">工号</label>
+                    <div class="controls">
+                        <input  id="name" name="name" type="text">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">密码</label>
+                    <div class="controls">
+                        <input id="password" name="password" type="password">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="toLogin();" class="btn btn-primary">登录</button>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+<script>
+    $.ajaxSetup({
+        contentType:"application/x-www-form-urlencoded;charset=utf-8",
+        complete:function(XMLHttpRequest,textStatus){
+            //通过XMLHttpRequest取得响应结果
+            var res = XMLHttpRequest.responseText;
+            try{
+                var jsonData = JSON.parse(res);
+                if(jsonData.code === 10001){
+                    //如果超时就处理 ，指定要跳转的页面(比如登陆页)
+                    alert(jsonData.message);
+                    window.location.replace("/login.html");
+                }else if(jsonData.success === false){
+                    //其他的异常情况,给个提示。
+                    alert(jsonData.message);
+                }else{
+                    //正常情况就不统一处理了
+                }
+            }catch(e){
+                alert(e);
+            }
+        }
+    });
+
+    function toLogin(){
+        var name = $("#name").val();
+        var password = $("#password").val();
+        if(name == null || name === ""){
+            alert("用户名不能为空");
+            return ;
+        }
+        if(password == null || password === ""){
+            alert("密码不能为空");
+            return ;
+        }
+        $.post('pay/user/login',{name:name,password:password},function(data){
+            if(data.data.permission === "1"){
+                location.href = 'main';
+            }else if(data.data.permission === "2"){
+                location.href = 'user_main';
+            }else if(data.data.permission === "0"){
+                $('#error').show();
+            }
+        },'json');
+    }
+</script>
+</html>

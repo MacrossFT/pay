@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+
+    <title></title>
+<!--    <base href="/">-->
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="../css/page.css" type="text/css"/>
+<!--    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">  &lt;!&ndash; start 响应式布局要添加的 &ndash;&gt;-->
+<!--    <script src="../bootstrap/js/jquery-3.1.1.min.js"></script>-->
+<!--    <script src="../bootstrap/js/bootstrap.js"></script>-->
+<!--    <script type="text/javascript" src="../js/page.js"></script>-->
+    <link rel="stylesheet" href="../layui/src/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="../easyui/themes/material-teal/easyui.css" >
+    <link rel="stylesheet" type="text/css" href="../easyui/themes/icon.css" />
+
+    <base href="/">
+    <script src="../layui/src/layui.js"></script>
+    <script src="../easyui/jquery.min.js"></script>
+    <script src="../easyui/jquery.easyui.min.js"></script>
+    <script src="../easyui/locale/easyui-lang-zh_CN.js"></script>
+
+</head>
+
+
+<body>
+
+<div id="mainLayout" class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'west'">
+        <table id="datagrid" class="easyui-datagrid"
+               data-options="title:'人员流动管理',fit:true,fitColumns:true,url:'pay/user/select',toolbar:'#datagrid-toolbars',singleSelect:true">
+            <thead>
+            <tr>
+                <th data-options="field:'id',width:100,height:50,align:'center'">ID</th>
+                <th data-options="field:'name',width:100,align:'center'">员工名称</th>
+                <th data-options="field:'departmentName',width:100,align:'center'">部门名称</th>
+            </tr>
+            </thead>
+        </table>
+
+    <div id="datagrid-toolbars">
+        <div class="layui-btn-group">
+<!--            <button class="btn btn-info btn-small textone" type="button" onclick="addfunction()"><li class="icon-plus icon-white"></li>新增</button>-->
+            <button class="btn btn-info btn-small textone" type="button" onclick="updatefunction()"><li class="icon-plus icon-white"></li>部门修改</button>
+<!--            <button class="btn btn-danger btn-small textone" type="button" onclick="deletefunction()"><li class="icon-remove icon-white"></li>删除</button>-->
+        </div>
+    </div>
+</div>
+
+<div id="updateDig" class="easyui-dialog" data-options="title:'部门修改',width:290,height:60,closed:true,modal:true,buttons:'#updateDig-buttons'">
+    <form id="updateFrom" method="post">
+        <input type="hidden" id="id" name="id" />
+        <ul>
+            <li>部门名称&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<select id="departmentSelect" name="departmentSelect" style="width: 168px">
+            </select></li>
+        </ul>
+    </form>
+</div>
+
+<div id="updateDig-buttons">
+    <button class="btn btn-info btn-small textone" onclick="toUpdate()">保存</button>
+</div>
+</div>
+<script type="text/javascript">
+    $.ajaxSetup({
+        contentType:"application/x-www-form-urlencoded;charset=utf-8",
+        complete:function(XMLHttpRequest,textStatus){
+            //通过XMLHttpRequest取得响应结果
+            const res = XMLHttpRequest.responseText;
+            try{
+                const jsonData = JSON.parse(res);
+                if(jsonData.code === '10001'){
+                    //如果超时就处理 ，指定要跳转的页面(比如登陆页)
+                    alert(jsonData.message);
+                    window.location.replace("/login");
+                }else if(jsonData.success === false){
+                    //其他的异常情况,给个提示。
+                    alert(jsonData.message);
+                }else{
+
+                }
+            }catch(e){
+                alert(e);
+            }
+        }
+    });
+
+    function selectDepartment() {
+        document.getElementById("departmentSelect").length = 0;
+        $.post('pay/department/select',function(data){
+            if(data.success === true){
+                for (var i = 0; i < data.rows.length; i++) {
+                    var jsonObj = data.rows[i];
+                    $("#departmentSelect").append("<option value='"+jsonObj.id+"'>" + jsonObj.name + "</option>");
+                }
+            }
+        },'json');
+    }
+
+    function updatefunction(){
+        selectDepartment();
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length !== 1){
+            $.messager.alert('提示','请选择一条要修改的记录','error');
+            return ;
+        }
+        $('#updateFrom').form('load',rows[0]);
+        //打开编辑窗口
+        $('#updateDig').dialog('open');
+    }
+
+    function toUpdate(){
+        const departmentId = $("#departmentSelect").val();
+        const id = $("#id").val();
+        $.post('pay/user/departUpdate',{id:id,departmentId:departmentId},function(data){
+            if(data.success === true){
+                $('#updateDig').dialog('close');
+                $('#updateForm').form('clear');
+                $('#datagrid').datagrid('load');
+                $.messager.show({
+                    title:'提示',
+                    msg:'修改成功'
+                });
+            }
+        },'json');
+    }
+</script>
+
+</body>
+</html>
