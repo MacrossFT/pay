@@ -101,4 +101,31 @@ public class ViewController {
     public String toLeave(){
         return "leave.html";
     }
+
+    /**
+     * 用户福利查看
+     * @return
+     */
+    @RequestMapping("user_welfare")
+    public String toUserWelfare(){
+        return "user_welfare.html";
+    }
+
+    /**
+     * 用户工资查看
+     * @return
+     */
+    @RequestMapping("user_salary")
+    public String toUserSalary(){
+        return "user_salary.html";
+    }
+
+    /**
+     * 请假管理
+     * @return
+     */
+    @RequestMapping("user_leave")
+    public String toUserLeave(){
+        return "user_leave.html";
+    }
 }

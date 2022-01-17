@@ -28,30 +28,24 @@
 <div id="mainLayout" class="easyui-layout" data-options="fit:true">
     <div data-options="region:'west'">
         <table id="datagrid" class="easyui-datagrid"
-               data-options="title:'考勤管理',fit:true,fitColumns:true,url:'pay/attendance/selectByUser',toolbar:'#yhGrid-toolbars',singleSelect:true">
+               data-options="title:'福利列表',fit:true,fitColumns:true,url:'pay/welfare/select',toolbar:'#yhGrid-toolbars',singleSelect:true">
             <thead>
             <tr>
                 <th data-options="field:'id',width:100,height:50,align:'center'">ID</th>
-                <th data-options="field:'morning',width:100,align:'center'">早上打卡时间</th>
-                <th data-options="field:'night',width:100,align:'center'">晚上打卡时间</th>
-                <th data-options="field:'day',width:100,align:'center'">打卡日期</th>
+                <th data-options="field:'festival',width:100,align:'center'">节日</th>
+                <th data-options="field:'welfare',width:100,align:'center'">节日福利</th>
+                <th data-options="field:'remark',width:100,align:'center'">备注</th>
             </tr>
             </thead>
         </table>
-
-        <div id="yhGrid-toolbars">
-            <div class="layui-btn-group">
-                <button class="btn btn-info btn-small textone" type="button" onclick="morningFunction()"><li class="icon-plus icon-white"></li>早上打开</button>
-                <button class="btn btn-info btn-small textone" type="button" onclick="nightFunction()"><li class="icon-plus icon-white"></li>晚上打卡</button>
-        </div>
     </div>
 </div>
-</div>
-<div id="userAddDig" class="easyui-dialog" data-options="title:'添加员工',width:290,height:200,closed:true,modal:true,buttons:'#userAddForm-Button'">
+
+<div id="userAddDig" class="easyui-dialog" data-options="title:'新增福利',width:290,height:200,closed:true,modal:true,buttons:'#userAddForm-Button'">
     <form id="addForm" method="post">
         <ul>
-            <li><input id="userName" name="userName" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'用户名'"/></li>
-            <li><input id="password" name="password" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'密码'" /></li>
+            <li><input id="festival" name="festival" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'节日'"/></li>
+            <li><input id="welfare" name="welfare" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'节日福利'" /></li>
             <li><input id="remark" name="remark" class="easyui-textbox" data-options="width:250,height:30,label:'备注'" /></li>
         </ul>
     </form>
@@ -60,11 +54,13 @@
     <button class="btn btn-info btn-small textone" onclick="saveFunction()">保存</button>
 </div>
 
-<div id="updateDig" class="easyui-dialog" data-options="title:'信息记录',width:290,height:150,closed:true,modal:true,buttons:'#updateDig-buttons'">
+<div id="updateDig" class="easyui-dialog" data-options="title:'福利修改',width:290,height:200,closed:true,modal:true,buttons:'#updateDig-buttons'">
     <form id="updateFrom" method="post">
         <input type="hidden" id="id" name="id" />
         <ul>
-            <li><input id="recordUpdate" name="record" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'记录'" /></li>
+            <li><input id="festivalUpdate" name="festival" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'节日'"/></li>
+            <li><input id="welfareUpdate" name="welfare" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'节日福利'" /></li>
+            <li><input id="remarkUpdate" name="remark" class="easyui-textbox" data-options="width:250,height:30,label:'备注'" /></li>
         </ul>
     </form>
 </div>
@@ -72,7 +68,7 @@
 <div id="updateDig-buttons">
     <button class="btn btn-info btn-small textone" onclick="toUpdate()">保存</button>
 </div>
-
+</div>
 <script type="text/javascript">
     $.ajaxSetup({
         contentType:"application/x-www-form-urlencoded;charset=utf-8",
@@ -97,35 +93,64 @@
         }
     });
 
-    function morningFunction(){
-        $.post('pay/attendance/morningAttendance',function(data){
+    function addfunction() {
+        $('#userAddDig').dialog('open');
+    }
+    function saveFunction() {
+        var festival = $("#festival").val();
+        var welfare = $("#welfare").val();
+        var remark = $("#remark").val();
+        $.post('pay/welfare/add',{festival:festival,welfare:welfare,remark:remark},function(data){
             if(data.success === true){
+                $('#userAddDig').dialog('close');
+                $('#addForm').form('clear');
+                $('#datagrid').datagrid('load');
                 $.messager.show({
                     title:'提示',
                     msg:'操作成功'
                 });
-                $('#datagrid').datagrid('load');
             }
-        });
+        },'json');
     }
 
-    function nightFunction(){
-        $.post('pay/attendance/nightAttendance',function(data){
-            if(data.success === true){
-                $.messager.show({
-                    title:'提示',
-                    msg:'操作成功'
-                });
-                $('#datagrid').datagrid('load');
-            }
-        });
+    function updatefunction(){
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length !== 1){
+            $.messager.alert('提示','请选择一条要修改的记录','error');
+            return ;
+        }
+        $('#updateFrom').form('load',rows[0]);
+        //打开编辑窗口
+        $('#updateDig').dialog('open');
     }
 
+    function deletefunction(){
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length === 0){
+            $.messager.alert("提示",'请选择要删除的记录','error');
+        }else{
+            $.messager.confirm('提示','是否确认删除',function(f){
+                if(f == true){
+                    $.post('pay/welfare/delete',{id:rows[0].id},function(data){
+                        if(data.success === true){
+                            $.messager.show({
+                                title:'提示',
+                                msg:'操作成功'
+                            });
+                            $('#datagrid').datagrid('load');
+                        }
+                    });
+                }
+            });
+        }
+    }
 
     function toUpdate(){
         const id = $("#id").val();
-        const record = $("#recordUpdate").val();
-        $.post('pay/attendance/updateRecord',{id:id,record:record},function(data){
+        var festival = $("#festivalUpdate").val();
+        var welfare = $("#welfareUpdate").val();
+        var remark = $("#remarkUpdate").val();
+        $.post('pay/welfare/update',{id:id,festival:festival,welfare:welfare,remark:remark},function(data){
             if(data.success === true){
                 $('#updateDig').dialog('close');
                 $('#updateForm').form('clear');

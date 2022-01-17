@@ -2,6 +2,7 @@ package com.pay.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.pay.common.BizException;
+import com.pay.common.DateUtil;
 import com.pay.common.PackResult;
 import com.pay.common.UserContextInfo;
 import com.pay.mapper.LeaveMapper;
@@ -39,6 +40,7 @@ public class LeaveController {
         if (!CollectionUtils.isEmpty(leavePOS)) {
             throw new BizException("今天你已请假，无需重复提交");
         }
+        DateUtil.isValidDate(leavePO.getDay(), "yyyy-MM-dd");
 
         leavePO.setUserId(UserContextInfo.getInstance().getUserId());
         leavePO.setUserName(UserContextInfo.getInstance().getUserName());
@@ -69,7 +71,7 @@ public class LeaveController {
      * @param
      * @return
      */
-    @PostMapping("selectByAll")
+    @PostMapping("select")
     @ResponseBody
     public PackResult<LeavePO> selectByAll() {
         LambdaQueryWrapper<LeavePO> queryWrapper = new LambdaQueryWrapper<>();

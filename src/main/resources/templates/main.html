@@ -22,13 +22,15 @@
 <div class="navbar">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a href="#" class="brand">
+            <a class="brand">
                 <small>
                     <i class="icon-leaf"></i>
                     欢迎使用员工管理系统
                 </small>
             </a><!--/.brand-->
-
+            <div style="text-align: right; vertical-align: center">
+                <button class="btn btn-info btn-small textone" onclick="logout()">登出</button>
+            </div>
         </div><!--/.container-fluid-->
     </div><!--/.navbar-inner-->
 </div>
@@ -161,39 +163,6 @@
                 </a>
             </li>
 
-            <li>
-                <a id="stayManageId" onclick="stayManage()" class="dropdown-toggle">
-                    <i class="icon-move"></i>
-                    <span class="menu-text">住宿管理 </span>
-
-                    <b class="arrow icon-angle-down"></b>
-                </a>
-
-                <ul class="submenu">
-                    <li>
-                        <a id="reservationsId" onclick="reservations()">
-                            <i class="icon-double-angle-right"></i>
-                            <span>客房预订</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a id="personageId" onclick="personage()">
-                            <i class="icon-double-angle-right"></i>
-                            <span>住宿登记</span>
-                        </a>
-                    </li>
-
-                    <!-- <li>
-                        <a id="groupId" onclick="group()">
-                            <i class="icon-double-angle-right"></i>
-                            <span>团队住宿登记 </span>
-                        </a>
-                    </li> -->
-
-                </ul>
-            </li>
-
         </ul><!--/.nav-list-->
 
         <div class="sidebar-collapse" id="sidebar-collapse">
@@ -220,7 +189,7 @@
         </div>
 
         <div style="width:100%;height:600px;">
-            <iframe id="Mainid" src="${ctx}/user/home.spring" style="width:100%;height:600px;"  frameBorder="0" scrolling="no"></iframe>
+            <iframe id="Mainid" src="userManager" style="width:100%;height:600px;"  frameBorder="0" scrolling="no"></iframe>
         </div>
 
         <!--/#ace-settings-container-->
@@ -557,16 +526,16 @@
         document.getElementById("smallGuide").innerHTML=s+"";
     }
 
-
-    function financeManage(){
-
-    }
-    function financeStatistics(){
-        var a=document.getElementById("financeManageId").getElementsByTagName('span')[0].innerHTML;
-        document.getElementById("bigGuide").innerHTML=a+"";
-        var s=document.getElementById("financeStatisticsId").getElementsByTagName('span')[0].innerHTML;
-        document.getElementById("smallGuide").innerHTML=s+"";
-        document.getElementById('Mainid').src='${ctx}/log/financial.spring';
+    function logout(){
+        $.post('pay/user/logout',{},function(data){
+            if(data.success === true){
+                $.messager.show({
+                    title:'提示',
+                    msg:'操作成功'
+                });
+            }
+        });
+        top.location = '/login';
     }
 
 </script>

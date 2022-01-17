@@ -97,7 +97,7 @@ public class SalaryController {
         if (StringUtils.isEmpty(po.getRealWages())) {
             throw new BizException("实际工资不允许为空");
         }
-        DateUtil.isValidDate(po.getMonth(), "yyyy-MM-dd");
+        DateUtil.isValidDate(po.getMonth(), "yyyy-MM");
     }
 
 }

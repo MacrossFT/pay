@@ -91,12 +91,14 @@
             return ;
         }
         $.post('pay/user/login',{name:name,password:password},function(data){
-            if(data.data.permission === "1"){
-                location.href = 'main';
-            }else if(data.data.permission === "2"){
-                location.href = 'user_main';
-            }else if(data.data.permission === "0"){
-                $('#error').show();
+            if(data.success === true){
+                if(data.data.permission === "1"){
+                    location.href = 'main';
+                }else if(data.data.permission === "2"){
+                    location.href = 'user_main';
+                }else if(data.data.permission === "0"){
+                    $('#error').show();
+                }
             }
         },'json');
     }

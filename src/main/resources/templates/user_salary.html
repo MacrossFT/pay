@@ -32,24 +32,12 @@
             <thead>
             <tr>
                 <th data-options="field:'id',width:100,height:50,align:'center'">ID</th>
-                <th data-options="field:'userName',width:100,align:'center'">员工名称</th>
                 <th data-options="field:'payable',width:100,align:'center'">应发工资</th>
                 <th data-options="field:'realWages',width:100,align:'center'">实际工资</th>
                 <th data-options="field:'month',width:100,align:'center'">月份</th>
             </tr>
             </thead>
         </table>
-
-        <div id="datagrid-toolbars">
-            <div class="layui-btn-group">
-                <button class="btn btn-info btn-small textone" type="button" onclick="addfunction()"><li class="icon-plus icon-white"></li>发放薪资</button>
-<!--                <button class="btn btn-info btn-small textone" type="button" onclick="updatefunction()"><li class="icon-plus icon-white"></li>编辑薪资</button>-->
-                <button class="btn btn-danger btn-small textone" type="button" onclick="deletefunction()"><li class="icon-remove icon-white"></li>删除</button>
-            </div>
-            <!--        <select id="userSelect" name="userSelect" aria-label="员工名称" onclick="selectUser()">-->
-            <!--            <span>选择用户</span>-->
-            <!--        </select>-->
-        </div>
     </div>
 
     <div id="addDig" class="easyui-dialog"  data-options="title:'添加薪资',width:290,height:220,closed:true,modal:true,buttons:'#addForm-Button'">

@@ -85,7 +85,7 @@
                 if(jsonData.code === '10001'){
                     //如果超时就处理 ，指定要跳转的页面(比如登陆页)
                     alert(jsonData.message);
-                    window.location.replace("/login");
+                    top.location = '/login';
                 }else if(jsonData.success === false){
                     //其他的异常情况,给个提示。
                     alert(jsonData.message);

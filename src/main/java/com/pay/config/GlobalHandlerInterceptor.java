@@ -30,6 +30,9 @@ public class GlobalHandlerInterceptor implements HandlerInterceptor {
         }
         UserPO userPO = (UserPO) user;
         UserContextInfo.getInstance().buildUser(userPO);
+        if ("2".equals(userPO.getPermission())) {
+            request.getRequestURI();
+        }
         return true;
     }
 

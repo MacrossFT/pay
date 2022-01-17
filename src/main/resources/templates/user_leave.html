@@ -28,31 +28,27 @@
 <div id="mainLayout" class="easyui-layout" data-options="fit:true">
     <div data-options="region:'west'">
         <table id="datagrid" class="easyui-datagrid"
-               data-options="title:'考勤管理',fit:true,fitColumns:true,url:'pay/attendance/selectByUser',toolbar:'#yhGrid-toolbars',singleSelect:true">
+               data-options="title:'请假管理',fit:true,fitColumns:true,url:'pay/leave/selectByUser',toolbar:'#datagrid-toolbars',singleSelect:true">
             <thead>
             <tr>
                 <th data-options="field:'id',width:100,height:50,align:'center'">ID</th>
-                <th data-options="field:'morning',width:100,align:'center'">早上打卡时间</th>
-                <th data-options="field:'night',width:100,align:'center'">晚上打卡时间</th>
-                <th data-options="field:'day',width:100,align:'center'">打卡日期</th>
+                <th data-options="field:'reason',width:100,align:'center'">请假理由</th>
+                <th data-options="field:'day',width:100,align:'center'">请假日期</th>
             </tr>
             </thead>
         </table>
-
-        <div id="yhGrid-toolbars">
+        <div id="datagrid-toolbars">
             <div class="layui-btn-group">
-                <button class="btn btn-info btn-small textone" type="button" onclick="morningFunction()"><li class="icon-plus icon-white"></li>早上打开</button>
-                <button class="btn btn-info btn-small textone" type="button" onclick="nightFunction()"><li class="icon-plus icon-white"></li>晚上打卡</button>
+                <button class="btn btn-info btn-small textone" type="button" onclick="addfunction()"><li class="icon-plus icon-white"></li>新增</button>
+            </div>
         </div>
-    </div>
 </div>
 </div>
-<div id="userAddDig" class="easyui-dialog" data-options="title:'添加员工',width:290,height:200,closed:true,modal:true,buttons:'#userAddForm-Button'">
+<div id="addDig" class="easyui-dialog" data-options="title:'请假',width:290,height:200,closed:true,modal:true,buttons:'#userAddForm-Button'">
     <form id="addForm" method="post">
         <ul>
-            <li><input id="userName" name="userName" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'用户名'"/></li>
-            <li><input id="password" name="password" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'密码'" /></li>
-            <li><input id="remark" name="remark" class="easyui-textbox" data-options="width:250,height:30,label:'备注'" /></li>
+            <li><input id="reason" name="reason" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'请假理由'"/></li>
+            <li><input id="day" name="day" class="easyui-textbox" data-options="required:true,width:250,height:30,label:'请假日期'" /></li>
         </ul>
     </form>
 </div>
@@ -97,30 +93,78 @@
         }
     });
 
-    function morningFunction(){
-        $.post('pay/attendance/morningAttendance',function(data){
+    function addfunction() {
+        $('#addDig').dialog('open');
+    }
+    function saveFunction() {
+        var reason = $("#reason").val();
+        var day = $("#day").val();
+        $.post('pay/leave/add',{reason:reason,day:day},function(data){
             if(data.success === true){
+                $('#addDig').dialog('close');
+                $('#addForm').form('clear');
+                $('#datagrid').datagrid('load');
                 $.messager.show({
                     title:'提示',
                     msg:'操作成功'
                 });
-                $('#datagrid').datagrid('load');
             }
-        });
+        },'json');
     }
 
-    function nightFunction(){
-        $.post('pay/attendance/nightAttendance',function(data){
-            if(data.success === true){
-                $.messager.show({
-                    title:'提示',
-                    msg:'操作成功'
-                });
-                $('#datagrid').datagrid('load');
-            }
-        });
+    function updatefunction(){
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length !== 1){
+            $.messager.alert('提示','请选择一条要修改的记录','error');
+            return ;
+        }
+        $('#updateFrom').form('load',rows[0]);
+        //打开编辑窗口
+        $('#updateDig').dialog('open');
     }
 
+    function deletefunction(){
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length === 0){
+            $.messager.alert("提示",'请选择要删除的记录','error');
+        }else{
+            $.messager.confirm('提示','是否确认删除',function(f){
+                if(f == true){
+                    $.post('pay/user/delete',{id:rows[0].id},function(data){
+                        if(data.success === true){
+                            $.messager.show({
+                                title:'提示',
+                                msg:'操作成功'
+                            });
+                            $('#datagrid').datagrid('load');
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    function resign(){
+        var rows = $('#datagrid').datagrid('getSelections');
+        if(rows.length === 0){
+            $.messager.alert("提示",'请选择要离职的员工','error');
+        }else{
+            $.messager.confirm('提示','是否确认办理离职',function(f){
+                if(f == true){
+                    $.post('pay/user/resign',{id:rows[0].id},function(data){
+                        if(data.success === true){
+                            $.messager.show({
+                                title:'提示',
+                                msg:'操作成功'
+                            });
+                            $('#datagrid').datagrid('load');
+                        }
+                    });
+                }
+            });
+        }
+
+    }
 
     function toUpdate(){
         const id = $("#id").val();
