@@ -10,6 +10,11 @@ public class ViewController {
         return "login.html";
     }
 
+    @RequestMapping("/")
+    public String test(){
+        return "login.html";
+    }
+
     @RequestMapping("main")
     public String toMain(){
         return "main.html";
